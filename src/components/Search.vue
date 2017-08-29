@@ -3,7 +3,6 @@
     <div>
       Search
       <input type="text" v-model="searchText">
-      <button @click="executeSearch()">OK</button>
     </div>
     <link-item
       v-for="(link, index) in allLinks"
@@ -26,16 +25,17 @@
         searchText: ''
       }
     },
-    methods: {
-      executeSearch () {
-        const { searchText } = this
-        this.$apollo.query({
-          query: ALL_LINKS_SEARCH_QUERY,
-          variables: { searchText }
-        }).then((result) => {
-          const links = result.data.allLinks
-          this.allLinks = links
-        })
+    apollo: {
+      allLinks: {
+        query: ALL_LINKS_SEARCH_QUERY,
+        variables () {
+          return {
+            searchText: this.searchText
+          }
+        },
+        skip () {
+          return !this.searchText
+        }
       }
     },
     components: {
@@ -43,7 +43,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

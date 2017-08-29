@@ -5,7 +5,7 @@
         class="mb2"
         v-model="description"
         type="text"
-        placeholder='A description for the link'>
+        placeholder="A description for the link">
       <input
         class="mb2"
         v-model="url"
@@ -57,8 +57,16 @@
                 orderBy: 'createdAt_DESC'
               }
             })
-            data.allLinks.splice(0, 0, createLink)
-            store.writeQuery({ query: ALL_LINKS_QUERY, data })
+            data.allLinks.push(createLink)
+            store.writeQuery({
+              query: ALL_LINKS_QUERY,
+              variables: {
+                first: 5,
+                skip: 0,
+                orderBy: 'createdAt_DESC'
+              },
+              data
+            })
           }
         }).then((data) => {
           this.$router.push({path: '/'})
@@ -71,6 +79,3 @@
     }
   }
 </script>
-
-<style scoped>
-</style>

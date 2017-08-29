@@ -47,7 +47,7 @@
     },
     methods: {
       confirm () {
-        const { name, email, password } = this
+        const { name, email, password } = this.$data
         if (this.login) {
           this.$apollo.mutate({
             mutation: SIGNIN_USER_MUTATION,
@@ -88,7 +88,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

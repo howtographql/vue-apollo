@@ -52,7 +52,7 @@ export const ALL_LINKS_SEARCH_QUERY = gql`
 `
 
 export const CREATE_LINK_MUTATION = gql`
-  mutation CreateLinkMutation ($description: String!, $url: String!, $postedById: ID!) {
+  mutation CreateLinkMutation($description: String!, $url: String!, $postedById: ID!) {
     createLink(
       description: $description,
       url: $url,
@@ -60,46 +60,40 @@ export const CREATE_LINK_MUTATION = gql`
     ) {
       id
       createdAt
-      description
       url
+      description
       postedBy {
         id
         name
-      }
-      votes {
-        id
-        user {
-          id
-        }
       }
     }
   }
 `
 
 export const CREATE_USER_MUTATION = gql`
-mutation CreateUserMutation($name: String!, $email: String!, $password: String!) {
-  createUser(
-    name: $name,
-    authProvider: {
-      email: {
-        email: $email,
-        password: $password
+  mutation CreateUserMutation($name: String!, $email: String!, $password: String!) {
+    createUser(
+      name: $name,
+      authProvider: {
+        email: {
+          email: $email,
+          password: $password
+        }
       }
-    }
-  ) {
-    id
-  }
-
-  signinUser(email: {
-    email: $email,
-    password: $password
-  }) {
-    token
-    user {
+    ) {
       id
     }
+
+    signinUser(email: {
+      email: $email,
+      password: $password
+    }) {
+      token
+      user {
+        id
+      }
+    }
   }
-}
 `
 
 export const CREATE_VOTE_MUTATION = gql`
@@ -178,15 +172,15 @@ export const NEW_VOTES_SUBSCRIPTION = gql`
 `
 
 export const SIGNIN_USER_MUTATION = gql`
-mutation SigninUserMutation($email: String!, $password: String!) {
-  signinUser(email: {
-    email: $email,
-    password: $password
-  }) {
-    token
-    user {
-      id
+  mutation SigninUserMutation($email: String!, $password: String!) {
+    signinUser(email: {
+      email: $email,
+      password: $password
+    }) {
+      token
+      user {
+        id
+      }
     }
   }
-}
 `

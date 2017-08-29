@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import { CREATE_VOTE_MUTATION } from '../constants/graphql'
+  import { ALL_LINKS_QUERY, CREATE_VOTE_MUTATION } from '../constants/graphql'
   import { GC_USER_ID, LINKS_PER_PAGE } from '../constants/settings'
   import { timeDifferenceForDate } from '../utils'
 
@@ -37,9 +37,8 @@
         }
       }
     },
-    props: ['link', 'index', 'pageNumber', 'updateStoreAfterVote'],
+    props: ['link', 'index', 'pageNumber'],
     methods: {
-      timeDifferenceForDate,
       voteForLink () {
         const userId = localStorage.getItem(GC_USER_ID)
         const voterIds = this.link.votes.map(vote => vote.user.id)
@@ -47,7 +46,6 @@
           alert(`User (${userId}) already voted for this link.`)
           return
         }
-
         const linkId = this.link.id
         this.$apollo.mutate({
           mutation: CREATE_VOTE_MUTATION,
@@ -59,7 +57,18 @@
             this.updateStoreAfterVote(store, createVote, linkId)
           }
         })
-      }
+      },
+      updateStoreAfterVote (store, createVote, linkId) {
+        const data = store.readQuery({
+          query: ALL_LINKS_QUERY
+        })
+
+        const votedLink = data.allLinks.find(link => link.id === linkId)
+        votedLink.votes = createVote.link.votes
+
+        store.writeQuery({ query: ALL_LINKS_QUERY, data })
+      },
+      timeDifferenceForDate
     }
   }
 </script>
