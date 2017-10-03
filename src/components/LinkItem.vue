@@ -67,9 +67,9 @@
         const query = {
           query: ALL_LINKS_QUERY,
           variables: {
-            first: first,
-            skip: skip,
-            orderBy: orderBy
+            first,
+            skip,
+            orderBy
           }
         }
         const data = store.readQuery(query)
