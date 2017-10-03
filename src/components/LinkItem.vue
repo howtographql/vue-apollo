@@ -64,19 +64,20 @@
         const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
         const first = isNewPage ? LINKS_PER_PAGE : 100
         const orderBy = isNewPage ? 'createdAt_DESC' : null
-        const data = store.readQuery({
+        const query = {
           query: ALL_LINKS_QUERY,
           variables: {
             first: first,
             skip: skip,
             orderBy: orderBy
           }
-        })
+        }
+        const data = store.readQuery(query)
 
         const votedLink = data.allLinks.find(link => link.id === linkId)
         votedLink.votes = createVote.link.votes
 
-        store.writeQuery({ query: ALL_LINKS_QUERY, data })
+        store.writeQuery({ ...query, data })
       },
       timeDifferenceForDate
     }
