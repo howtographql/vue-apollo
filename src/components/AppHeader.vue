@@ -1,22 +1,35 @@
 <template>
-  <div class="flex pa1 justify-between nowrap orange">
-    <div class="flex flex-fixed black">
-      <div class="fw7 mr1">Hacker News</div>
-      <router-link to="/" class="ml1 no-underline black">new</router-link>
-      <div class="ml1">|</div>
-      <router-link to="/top" class="ml1 no-underline black">top</router-link>
-      <div class="ml1">|</div>
-      <router-link to="/search" class="ml1 no-underline black">search</router-link>
-      <div class="flex" v-if="userId">
-        <div class="ml1">|</div>
-        <router-link to="/create" class="ml1 no-underline black">submit</router-link>
-      </div>
-    </div>
-    <div class="flex flex-fixed">
-      <div v-if="userId" class="ml1 pointer black" @click="logout()">logout</div>
-      <router-link v-else to="/login" class="ml1 no-underline black">login</router-link>
-    </div>
-  </div>
+  <nav class="pa3 pa4-ns">
+    <router-link
+      class="link dim black b f6 f5-ns dib mr3"
+      to="/"
+      title="Feed"
+    >
+      Blog
+    </router-link>
+    <router-link
+      class="link dim f6 f5-ns dib mr3 black"
+      activeClassName="gray"
+      to="/"
+      title="Feed"
+    >
+      Feed
+    </router-link>
+    <router-link
+      class="link dim f6 f5-ns dib mr3 black"
+      activeClassName="gray"
+      to="/drafts"
+      title="Drafts"
+    >
+      Drafts
+    </router-link>
+    <router-link
+      to="/create"
+      class="f6 link dim br1 ba ph3 pv2 fr mb2 dib black"
+    >
+      + Create Draft
+    </router-link>
+  </nav>
 </template>
 
 <script>
