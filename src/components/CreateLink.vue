@@ -18,7 +18,6 @@
 
 <script>
   import { ALL_LINKS_QUERY, CREATE_LINK_MUTATION } from '../constants/graphql'
-  import { GC_USER_ID } from '../constants/settings'
 
   export default {
     name: 'CreateLink',
@@ -30,12 +29,6 @@
     },
     methods: {
       createLink () {
-        const postedById = localStorage.getItem(GC_USER_ID)
-        if (!postedById) {
-          console.error('No user logged in')
-          return
-        }
-
         const newDescription = this.description
         const newUrl = this.url
         this.description = ''
@@ -45,10 +38,9 @@
           mutation: CREATE_LINK_MUTATION,
           variables: {
             description: newDescription,
-            url: newUrl,
-            postedById
+            url: newUrl
           },
-          update: (store, { data: { createLink } }) => {
+          update: (store, { data: { post } }) => {
             const data = store.readQuery({
               query: ALL_LINKS_QUERY,
               variables: {
@@ -57,7 +49,7 @@
                 orderBy: 'createdAt_DESC'
               }
             })
-            data.allLinks.push(createLink)
+            data.feed.links.splice(0, 0, post)
             store.writeQuery({
               query: ALL_LINKS_QUERY,
               variables: {

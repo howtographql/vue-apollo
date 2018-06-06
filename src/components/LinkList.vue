@@ -27,17 +27,19 @@
     name: 'LinkList',
     data () {
       return {
-        allLinks: [],
+        allLinks: null,
         count: 0,
         loading: 0
       }
     },
     computed: {
       orderedLinks: function () {
-        if (this.$route.path.includes('top')) {
-          return _.orderBy(this.allLinks, 'votes.length').reverse()
-        } else {
-          return this.allLinks
+        if (this.allLinks) {
+          if (this.$route.path.includes('top')) {
+            return _.orderBy(this.allLinks.feed.links, 'votes.length').reverse()
+          } else {
+            return this.allLinks.feed.links
+          }
         }
       },
       isFirstPage () {
@@ -58,10 +60,11 @@
     },
     methods: {
       getLinksToRender (isNewPage) {
+        console.log(this.$apollo.queries.feed)
         if (isNewPage) {
-          return this.$apollo.queries.allLinks
+          return this.$apollo.queries.feed
         }
-        const rankedLinks = this.$apollo.queries.allLinks.slice()
+        const rankedLinks = this.$apollo.queries.feed.slice()
         rankedLinks.sort((l1, l2) => l2.votes.length - l1.votes.length)
         return rankedLinks
       },
@@ -96,20 +99,23 @@
           }
         },
         update (data) {
-          this.count = data._allLinksMeta.count
-          return data.allLinks
+          this.count = data.feed.count
+          return data
         },
         subscribeToMore: [
           {
             document: NEW_LINKS_SUBSCRIPTION,
             updateQuery: (previous, { subscriptionData }) => {
               const newAllLinks = [
-                subscriptionData.data.Link.node,
-                ...previous.allLinks
+                subscriptionData.data.newLink.node,
+                ...previous.feed.links
               ]
               const result = {
                 ...previous,
-                allLinks: newAllLinks.slice(0, 5)
+                feed: {
+                  ...previous.feed,
+                  links: newAllLinks
+                }
               }
               return result
             }
@@ -117,13 +123,16 @@
           {
             document: NEW_VOTES_SUBSCRIPTION,
             updateQuery: (previous, { subscriptionData }) => {
-              const votedLinkIndex = previous.allLinks.findIndex(link => link.id === subscriptionData.data.Vote.node.link.id)
-              const link = subscriptionData.data.Vote.node.link
-              const newAllLinks = previous.allLinks.slice()
+              const votedLinkIndex = previous.feed.links.findIndex(link => link.id === subscriptionData.data.newVote.node.link.id)
+              const link = subscriptionData.data.newVote.node.link
+              const newAllLinks = previous.feed.links.slice()
               newAllLinks[votedLinkIndex] = link
               const result = {
                 ...previous,
-                allLinks: newAllLinks
+                feed: {
+                  ...previous.feed,
+                  links: newAllLinks
+                }
               }
               return result
             }

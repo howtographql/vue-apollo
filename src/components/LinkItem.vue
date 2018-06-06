@@ -15,7 +15,7 @@
 
 <script>
   import { ALL_LINKS_QUERY, CREATE_VOTE_MUTATION } from '../constants/graphql'
-  import { GC_USER_ID, LINKS_PER_PAGE } from '../constants/settings'
+  import { LINKS_PER_PAGE, USER_ID } from '../constants/settings'
   import { timeDifferenceForDate } from '../utils'
 
   export default {
@@ -27,7 +27,7 @@
     },
     computed: {
       userId () {
-        return this.$root.$data.userId
+        return localStorage.getItem(USER_ID)
       },
       linkNumber () {
         if (this.$route.path.includes('new')) {
@@ -40,25 +40,18 @@
     props: ['link', 'index', 'pageNumber'],
     methods: {
       voteForLink () {
-        const userId = localStorage.getItem(GC_USER_ID)
-        const voterIds = this.link.votes.map(vote => vote.user.id)
-        if (voterIds.includes(userId)) {
-          alert(`User (${userId}) already voted for this link.`)
-          return
-        }
         const linkId = this.link.id
         this.$apollo.mutate({
           mutation: CREATE_VOTE_MUTATION,
           variables: {
-            userId,
             linkId
           },
-          update: (store, { data: { createVote } }) => {
-            this.updateStoreAfterVote(store, createVote, linkId)
+          update: (store, { data: { vote } }) => {
+            this.updateStoreAfterVote(store, vote, linkId)
           }
         })
       },
-      updateStoreAfterVote (store, createVote, linkId) {
+      updateStoreAfterVote (store, vote, linkId) {
         const page = parseInt(this.$route.params.page, 10)
         const isNewPage = this.$route.path.includes('new')
         const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0
@@ -73,9 +66,8 @@
           }
         }
         const data = store.readQuery(query)
-
-        const votedLink = data.allLinks.find(link => link.id === linkId)
-        votedLink.votes = createVote.link.votes
+        const votedLink = data.feed.links.find(link => link.id === linkId)
+        votedLink.votes = vote.link.votes
 
         store.writeQuery({ ...query, data })
       },

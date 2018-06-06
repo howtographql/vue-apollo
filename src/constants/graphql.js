@@ -1,50 +1,47 @@
 import gql from 'graphql-tag'
 
 export const ALL_LINKS_QUERY = gql`
-  query AllLinksQuery($first: Int, $skip: Int, $orderBy: LinkOrderBy) {
-    allLinks(first: $first, skip: $skip, orderBy: $orderBy) {
-      id
-      createdAt
-      url
-      description
-      postedBy {
+  query AllLinksQuery($first: Int, $skip: Int, $orderBy: LinkOrderByInput) {
+    feed(first: $first, skip: $skip, orderBy: $orderBy) {
+      count
+      links {
         id
-        name
-      }
-      votes {
-        id
-        user {
+        url
+        description
+        createdAt
+        postedBy {
           id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
         }
       }
-    }
-    _allLinksMeta {
-      count
     }
   }
 `
 
 export const ALL_LINKS_SEARCH_QUERY = gql`
   query AllLinksSearchQuery($searchText: String!) {
-    allLinks(filter: {
-      OR: [{
-        url_contains: $searchText
-      }, {
-        description_contains: $searchText
-      }]
-    }) {
-      id
-      url
-      description
-      createdAt
-      postedBy {
+    feed(filter: $searchText) {
+      count
+      links {
         id
-        name
-      }
-      votes {
-        id
-        user {
+        url
+        description
+        createdAt
+        postedBy {
           id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
         }
       }
     }
@@ -52,16 +49,15 @@ export const ALL_LINKS_SEARCH_QUERY = gql`
 `
 
 export const CREATE_LINK_MUTATION = gql`
-  mutation CreateLinkMutation($description: String!, $url: String!, $postedById: ID!) {
-    createLink(
+  mutation CreateLinkMutation($description: String!, $url: String!) {
+    post(
       description: $description,
-      url: $url,
-      postedById: $postedById
+      url: $url
     ) {
       id
-      createdAt
       url
       description
+      createdAt
       postedBy {
         id
         name
@@ -75,22 +71,11 @@ export const CREATE_LINK_MUTATION = gql`
 
 export const CREATE_USER_MUTATION = gql`
   mutation CreateUserMutation($name: String!, $email: String!, $password: String!) {
-    createUser(
+    signup(
       name: $name,
-      authProvider: {
-        email: {
-          email: $email,
-          password: $password
-        }
-      }
-    ) {
-      id
-    }
-
-    signinUser(email: {
       email: $email,
       password: $password
-    }) {
+    ) {
       token
       user {
         id
@@ -100,8 +85,8 @@ export const CREATE_USER_MUTATION = gql`
 `
 
 export const CREATE_VOTE_MUTATION = gql`
-  mutation CreateVoteMutation($userId: ID!, $linkId: ID!) {
-    createVote(userId: $userId, linkId: $linkId) {
+  mutation CreateVoteMutation($linkId: ID!) {
+    vote(linkId: $linkId) {
       id
       link {
         votes {
@@ -120,9 +105,7 @@ export const CREATE_VOTE_MUTATION = gql`
 
 export const NEW_LINKS_SUBSCRIPTION = gql`
   subscription {
-    Link(filter: {
-      mutation_in: [CREATED]
-    }) {
+    newLink {
       node {
         id
         url
@@ -145,9 +128,7 @@ export const NEW_LINKS_SUBSCRIPTION = gql`
 
 export const NEW_VOTES_SUBSCRIPTION = gql`
   subscription {
-    Vote(filter: {
-      mutation_in: [CREATED]
-    }) {
+    newVote {
       node {
         id
         link {
@@ -176,10 +157,10 @@ export const NEW_VOTES_SUBSCRIPTION = gql`
 
 export const SIGNIN_USER_MUTATION = gql`
   mutation SigninUserMutation($email: String!, $password: String!) {
-    signinUser(email: {
+    login(
       email: $email,
       password: $password
-    }) {
+    ) {
       token
       user {
         id

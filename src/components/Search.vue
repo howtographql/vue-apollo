@@ -35,6 +35,9 @@
         },
         skip () {
           return !this.searchText
+        },
+        update (data) {
+          return data.feed.links
         }
       }
     },

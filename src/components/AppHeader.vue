@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import { GC_USER_ID, GC_AUTH_TOKEN } from '../constants/settings'
+  import { USER_ID } from '../constants/settings'
 
   export default {
     name: 'AppHeader',
@@ -31,9 +31,8 @@
     },
     methods: {
       logout () {
-        localStorage.removeItem(GC_USER_ID)
-        localStorage.removeItem(GC_AUTH_TOKEN)
-        this.$root.$data.userId = localStorage.getItem(GC_USER_ID)
+        localStorage.removeItem(USER_ID)
+        this.$root.$data.userId = localStorage.getItem(USER_ID)
       }
     }
   }

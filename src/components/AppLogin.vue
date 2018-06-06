@@ -33,7 +33,7 @@
 
 <script>
   import { CREATE_USER_MUTATION, SIGNIN_USER_MUTATION } from '../constants/graphql'
-  import { GC_USER_ID, GC_AUTH_TOKEN } from '../constants/settings'
+  import { AUTH_TOKEN, USER_ID } from '../constants/settings'
 
   export default {
     name: 'AppLogin',
@@ -56,9 +56,9 @@
               password
             }
           }).then((result) => {
-            const id = result.data.signinUser.user.id
-            const token = result.data.signinUser.token
-            this.saveUserData(id, token)
+            const id = result.data.login.user.id
+            const { token } = result.data.login
+            this.saveUserData(token, id)
           }).catch((error) => {
             alert(error)
           })
@@ -71,19 +71,20 @@
               password
             }
           }).then((result) => {
-            const id = result.data.signinUser.user.id
-            const token = result.data.signinUser.token
-            this.saveUserData(id, token)
+            const id = result.data.signup.user.id
+            const { token } = result.data.signup
+            console.log(id, token)
+            this.saveUserData(token, id)
           }).catch((error) => {
             alert(error)
           })
         }
         this.$router.push({path: '/'})
       },
-      saveUserData (id, token) {
-        localStorage.setItem(GC_USER_ID, id)
-        localStorage.setItem(GC_AUTH_TOKEN, token)
-        this.$root.$data.userId = localStorage.getItem(GC_USER_ID)
+      saveUserData (token, id) {
+        localStorage.setItem(USER_ID, id)
+        localStorage.setItem(AUTH_TOKEN, token)
+        this.$root.$data.userId = localStorage.getItem(USER_ID)
       }
     }
   }
