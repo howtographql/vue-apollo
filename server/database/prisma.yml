@@ -1,0 +1,5 @@
+endpoint: __PRISMA_ENDPOINT__
+datamodel: datamodel.graphql
+hooks:
+  post-deploy:
+    - graphql get-schema --project database
